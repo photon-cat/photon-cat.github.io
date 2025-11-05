@@ -26,6 +26,19 @@ Each arm of the T40 has a power and communication cable harness. The M1 & M2 arm
 
 ![FC I/O board connections](/assets/images/tofc.png)
 
+**Pinout:**
+```
+1 - Red:    Signal GND
+2 - Yellow: B/Low (RS-485 Bus 0)
+3 - Blue:   A/High (RS-485 Bus 0)
+4 - Black:  Signal GND
+5 - White:  B/Low (RS-485 Bus 1)
+6 - Green:  A/High (RS-485 Bus 1)
+
++ - Battery Positive
+- - Battery Negative
+``` 
+
 ## Test Setup
 
 To interface with the RS-485 bus, I built a simple SAMD21 breadboard setup with an RS-485 transceiver:
@@ -36,7 +49,7 @@ Here's the setup connected to the drone on the ground for testing:
 
 ![Connectivity to drone setup](/assets/images/connecivitytodrone.png)
 
-The Agras T40 uses 8 ESCs communicating over RS-485. I captured the power-up sequence with an oscilloscope.
+The Agras T40 uses 8 ESCs communicating over RS-485. Figured this out by probing with scope and measuring signal timing. Quickly figured out it was UART 8N1 @ 115200 baud
 
 ## Finding Frame Boundaries
 
