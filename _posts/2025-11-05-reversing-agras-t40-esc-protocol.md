@@ -6,12 +6,27 @@ categories: reverse-engineering hardware
 tags: dji agras-t40 esc protocol rs485 embedded
 ---
 
-So if your looking to build some big quads for heavy lift applications motors and escs get pretty expencive. However, you can find exess parts for DJI or XAG for really cheep. Like $150 bucks for a motor and esc off aliexpress for a t40. These are 12S escs driving 48KV motors with big props. each put out about ~25kg of thrust at full power. However DJI documents litterly nothing. Not even wiring diagrams. So my goal is to figure out how the flight controller talks to the ESCs so I can control them independently. The ideas to to have a MCU that takes PWM, or a standard digitial esc protocol like dshot or multishot and outputs the dji protocol with the proper arming and trottle commands. 
-Part 1 the drone
+So if you're looking to build some big quads for heavy lift applications, motors and ESCs get pretty expensive. However, you can find excess parts for DJI or XAG for really cheap. Like $150 bucks for a motor and ESC off AliExpress for a T40. These are 12S ESCs driving 48KV motors with big props. Each puts out about ~25kg of thrust at full power. However, DJI documents literally nothing. Not even wiring diagrams. So my goal is to figure out how the flight controller talks to the ESCs so I can control them independently. The idea is to have an MCU that takes PWM, or a standard digital ESC protocol like DShot or Multishot, and outputs the DJI protocol with the proper arming and throttle commands. 
 
+## Part 1: The Drone
 
-The Agras T40 uses 8 ESCs communicating over RS-485 at 115200 baud, 8N1. I captured the power-up sequence with an oscilloscope - about 14 seconds of data, 1,517 frames total.
+The Agras T40 is a heavy lift ag drone capable of lifting 50kg of payload for spraying or seeding. It has 8 motors in a coaxial octocopter config.
 
+![DJI Motor Numbering](/assets/images/djimotornumbering.png)
+
+There are many good videos on tearing down the drone: [YouTube Playlist](https://www.youtube.com/playlist?list=PLL_qYPl492bbeQikXkj2hTP7VNOUgR1ek)
+
+## MITMing the ESC
+
+Each arm of the T40 has a power and communication cable harness. The M1 & M2 arms carry power and ground for each motor, and M3 & M4 arms have power for the 2 motors and the rotary nozzle. To get connectivity to the ESC, I bought the [M1/M2 harness](https://www.aliexpress.us/item/3256805194788268.html?gatewayAdapt=glo2usa4itemAdapt) and tapped the 6 communication wires. A little probing found pins 2&3 and 5&6 had 120 ohm termination internal to the ESC and in the flight controller.
+
+![Tapped signal wires](/assets/images/taps.png)
+
+![Connectors going to ESC](/assets/images/to_esc.png)
+
+![FC I/O board connections](/assets/images/tofc.png)
+
+The Agras T40 uses 8 ESCs communicating over RS-485. I captured the power-up sequence with an oscilloscope.
 
 ## Step 1: Finding Frame Boundaries
 
@@ -85,7 +100,7 @@ After the length byte, there's a consistent header structure:
 
 ## Step 4: The Self-Test Pattern
 
-Now its time to look at the first few frames the drone sends on power up
+Now it's time to look at the first few frames the drone sends on power up.
 
 ```
 Frame 1:  F4 01 AC 03 AC 03 AC 03 AC 03 AC 03 AC 03 AC 03
@@ -93,7 +108,7 @@ Frame 3:  AC 03 F4 01 AC 03 AC 03 AC 03 AC 03 AC 03 AC 03
 Frame 6:  AC 03 AC 03 F4 01 AC 03 AC 03 AC 03 AC 03 AC 03
 ```
 
-The value `0x01F4` (500 decimal) **walks through each channel** - a classic self-test pattern. While this happens, the reserved field has bit 6 set (`0x0040`), indicating POST mode.
+The value `0x01F4` (500 decimal). While this happens, the reserved field has bit 6 set (`0x0040`), indicating POST mode.
 
 At frame 18 (~160ms), the flag clears to `0x0000` and all channels settle to `0x03AC` (940 = 48V battery voltage).
 
@@ -113,4 +128,5 @@ For `0xA021` command frames, the payload includes:
 - 4 throttle values (16-bit each)
 - Arm flag at byte offset 15 (`0x00` = disarmed, `0x80` = armed)
 - Various state and control fields
+
 
