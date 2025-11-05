@@ -38,7 +38,7 @@ Here's the setup connected to the drone on the ground for testing:
 
 The Agras T40 uses 8 ESCs communicating over RS-485. I captured the power-up sequence with an oscilloscope.
 
-## Step 1: Finding Frame Boundaries
+## Finding Frame Boundaries
 
 The initial capture was just a stream of bytes:
 
@@ -63,11 +63,12 @@ Testing the hypothesis: if the byte after `0x55` is a length field...
 [0x55] [Length] [Length bytes of data] [2-byte checksum]
 ```
 
-## Step 2: Cracking the Checksum
+##  the Checksum
 
-Tried common algorithms: simple sum, XOR, CRC-8... none matched. Finally tested CRC-16 variants. This is what codex is good for. 
+Tried common algorithms: simple sum, XOR, CRC-8d, CRC-16 variants. 
 
-Custom CRC-16 with initial value `0x3692` and polynomial `0x8005`.
+It's a custom CRC-16 with initial value `0x3692` and polynomial `0x8005`.
+
 
 ```python
 def calculate_crc16(data):
@@ -84,7 +85,7 @@ def calculate_crc16(data):
 
 Verified on multiple frames - 100% match.
 
-## Step 3: Decoding the Header
+## Decoding the Header
 
 After the length byte, there's a consistent header structure:
 
@@ -108,7 +109,7 @@ After the length byte, there's a consistent header structure:
 - `0x01 0x00` = FC sending
 - `0x00 0x??` = ESC sending
 
-## Step 4: The Self-Test Pattern
+## The Self-Test Pattern
 
 Now it's time to look at the first few frames the drone sends on power up.
 
@@ -122,7 +123,7 @@ The value `0x01F4` (500 decimal). While this happens, the reserved field has bit
 
 At frame 18 (~160ms), the flag clears to `0x0000` and all channels settle to `0x03AC` (940 = 48V battery voltage).
 
-## Step 5: Payload Decoding
+## Payload Decoding
 
 For `0xA0D0` telemetry frames, the payload contains 8 channels of 16-bit little-endian values:
 
