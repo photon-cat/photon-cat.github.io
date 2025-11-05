@@ -1,0 +1,47 @@
+# Site settings
+title: Photon Cat's Lab
+description: Hardware hacking, reverse engineering, and embedded systems
+author: Photon Cat
+email: your-email@example.com
+url: "https://photon-cat.github.io"
+baseurl: ""
+
+# Build settings
+markdown: kramdown
+theme: minima
+permalink: /blog/:year/:month/:day/:title/
+
+# Plugin settings
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+# Collections
+collections:
+  posts:
+    output: true
+    permalink: /blog/:year/:month/:day/:title/
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+
+# Default front matter
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+      author: "Photon Cat"
+
+# Navigation
+header_pages:
+  - about.md
+  - index.md
