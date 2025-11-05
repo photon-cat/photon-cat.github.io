@@ -66,12 +66,12 @@ AC 03 79 CA 55 1A 00 D0 A0 00 00 07 AC 03 AC 03 ...
 55 24 00 21 A0 01 00 00 50 15 07 00 98 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 00 00 40 00 00 00 AA F1
 ```
 
-Testing the hypothesis: if the byte after `0x55` is a length field...
+Testing if the byte after `0x55` is a length field...
 
 - First frame: `0x1A` (26 bytes) → counted 26 bytes of data + 2 checksum bytes
 - Second frame: `0x24` (36 bytes) → counted 36 bytes of data + 2 checksum bytes
 
-**Frame structure discovered**:
+**Frame structure**:
 ```
 [0x55] [Length] [Length bytes of data] [2-byte checksum]
 ```
