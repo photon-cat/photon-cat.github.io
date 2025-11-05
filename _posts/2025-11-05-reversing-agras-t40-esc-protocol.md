@@ -26,6 +26,16 @@ Each arm of the T40 has a power and communication cable harness. The M1 & M2 arm
 
 ![FC I/O board connections](/assets/images/tofc.png)
 
+## Test Setup
+
+To interface with the RS-485 bus, I built a simple SAMD21 breadboard setup with an RS-485 transceiver:
+
+![SAMD21 RS-485 breadboard setup](/assets/images/samd21rs485.png)
+
+Here's the setup connected to the drone on the ground for testing:
+
+![Connectivity to drone setup](/assets/images/connecivitytodrone.png)
+
 The Agras T40 uses 8 ESCs communicating over RS-485. I captured the power-up sequence with an oscilloscope.
 
 ## Step 1: Finding Frame Boundaries
